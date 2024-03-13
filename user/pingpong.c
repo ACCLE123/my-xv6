@@ -8,28 +8,34 @@ int main(int argc, char* argv[]) {
     fprintf(STDERR, "usage pingpong(no parameter)\n");
     exit(1);
   }
+  
+  int parent_fd[2];
+  int child_fd[2];
+  char buf[20];
 
-  int p[2];
-  pipe(p);
+  pipe(child_fd);
+  pipe(parent_fd);
 
-  int cur_pid = fork();
-  if (cur_pid == 0) {
-    char buf[20];
-    if (read(p[REC], buf, sizeof buf)) {
-      fprintf(STDOUT, "%d: received pong\n", getpid());
-    }
-    write(p[SND], "child", 5);
+  int pid;
+  if ((pid = fork()) == 0) {
+    close(parent_fd[SND]);
+    close(child_fd[REC]);
+
+    read(parent_fd[REC], buf, 4);
+    printf("%d: received %s\n", getpid(), buf);
+    write(child_fd[SND], "pong", 4);
+
     exit(0);
-  } else if (cur_pid > 0) {
-    char buf[20];
-    write(p[SND], "parent", 6);
-    wait(0);
-    if (read(p[REC], buf, sizeof buf)) {
-      printf("%d: received ping\n", getpid(), buf);
-    }
-    exit(0);
+  
   } else {
-    fprintf(STDERR, "fork error\n");
-    exit(1);
+    close(parent_fd[REC]);
+    close(child_fd[SND]);
+
+    write(parent_fd[SND], "ping", 4);
+    read(child_fd[0], buf, 4);
+    printf("%d: received %s\n", getpid(), buf);
+    
+    wait(0);
+    exit(0);
   }
 }
