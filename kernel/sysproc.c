@@ -97,13 +97,14 @@ sys_uptime(void)
 }
 
 
+// 将trace num 这里的num 赋值到 struct pro 上 
+// S态和U态进程的页表不同
 uint64
-sys_trace()
+sys_trace(void)
 {
-  // printf("hello world\n");
   int mask;
 
-  if (argint(0, &mask) < 0)
+  if (argint(0, &mask) < 0) // a0
       return -1;
 
   struct proc *pro = myproc();

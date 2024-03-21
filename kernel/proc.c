@@ -5,6 +5,8 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "sysinfo.h"
+#include "kalloc.c"
 
 struct cpu cpus[NCPU];
 
@@ -231,6 +233,7 @@ userinit(void)
 
   p = allocproc();
   initproc = p;
+  
   
   // allocate one user page and copy init's instructions
   // and data into it.
@@ -659,4 +662,38 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+uint64
+get_used_proc() {
+  struct proc *p;
+  uint64 res = 0;
+
+  for(p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if(p->state != UNUSED) res++;
+    release(&p->lock);
+  }
+
+  return res;
+}
+
+uint64
+sys_sysinfo() {
+  struct sysinfo info;
+  struct proc* cur_proc = myproc();
+  uint64 usr_addr;
+
+  info.freemem = get_fremem();
+  info.nproc = get_used_proc();
+
+  if (argaddr(0, &usr_addr)) {
+    return -1;
+  }
+  
+  if (copyout(cur_proc->pagetable, usr_addr, (char*)&info, sizeof(info))) {
+    return -1;
+  }
+
+  return 0;
 }
