@@ -100,15 +100,15 @@ sys_uptime(void)
 uint64
 sys_trace()
 {
-  printf("hello world\n");
-  // int mask;
+  // printf("hello world\n");
+  int mask;
 
-  // if (argint(0, &mask) < 0)
-  //     return -1;
+  if (argint(0, &mask) < 0)
+      return -1;
 
-  // struct proc *pro = myproc();
-  // printf("trace pid: %d\n", pro->pid);
-  // pro->trace_mask = mask;
+  struct proc *pro = myproc();
+  printf("trace pid: %d\n", pro->pid);
+  pro->trace_mask = mask;
 
   return 0;
 } 
