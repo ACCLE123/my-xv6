@@ -164,6 +164,8 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  // trace
+  p->trace_mask = 0;
 }
 
 // Create a user page table for a given process,
@@ -312,7 +314,11 @@ fork(void)
   release(&wait_lock);
 
   acquire(&np->lock);
-  np->state = RUNNABLE;
+  np->state = RUNNABLE; 
+  release(&np->lock);
+
+  acquire(&np->lock);
+  np->trace_mask = p->trace_mask;
   release(&np->lock);
 
   return pid;
