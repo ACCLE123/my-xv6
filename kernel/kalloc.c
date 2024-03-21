@@ -92,6 +92,6 @@ get_fremem() {
     r = r->next;
     res++;
   }
-  release(&kmem.freelist);
+  release(&kmem.lock);
   return res * PGSIZE;
 }

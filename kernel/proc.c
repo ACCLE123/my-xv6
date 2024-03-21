@@ -6,7 +6,6 @@
 #include "proc.h"
 #include "defs.h"
 #include "sysinfo.h"
-#include "kalloc.c"
 
 struct cpu cpus[NCPU];
 
@@ -680,6 +679,7 @@ get_used_proc() {
 
 uint64
 sys_sysinfo() {
+  // printf("sysinfo hello\n");
   struct sysinfo info;
   struct proc* cur_proc = myproc();
   uint64 usr_addr;
