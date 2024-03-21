@@ -687,11 +687,11 @@ sys_sysinfo() {
   info.freemem = get_fremem();
   info.nproc = get_used_proc();
 
-  if (argaddr(0, &usr_addr)) {
+  if (argaddr(0, &usr_addr) < 0) {
     return -1;
   }
   
-  if (copyout(cur_proc->pagetable, usr_addr, (char*)&info, sizeof(info))) {
+  if (copyout(cur_proc->pagetable, usr_addr, (char*)&info, sizeof(info)) < 0) {
     return -1;
   }
 
