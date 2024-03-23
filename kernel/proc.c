@@ -196,6 +196,9 @@ proc_pagetable(struct proc *p)
     return 0;
   }
 
+  // if (mappages(pagetable, USYSCALL, PGSIZE, 
+  //             uint64)(p->usycall),PTE_R | PTE_U))
+
   return pagetable;
 }
 

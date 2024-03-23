@@ -77,6 +77,9 @@ kvminithart()
 //   21..29 -- 9 bits of level-1 index.
 //   12..20 -- 9 bits of level-0 index.
 //    0..11 -- 12 bits of byte offset within the page.
+
+// pagetable in satp
+// pagetable is int[512] in physical memory !!!! , and pte is a item in pagetable
 pte_t *
 walk(pagetable_t pagetable, uint64 va, int alloc)
 {
@@ -89,7 +92,7 @@ walk(pagetable_t pagetable, uint64 va, int alloc)
       pagetable = (pagetable_t)PTE2PA(*pte);
     } else {
       if(!alloc || (pagetable = (pde_t*)kalloc()) == 0)
-        return 0;
+        return 0; 
       memset(pagetable, 0, PGSIZE);
       *pte = PA2PTE(pagetable) | PTE_V;
     }
@@ -271,7 +274,7 @@ freewalk(pagetable_t pagetable)
     pte_t pte = pagetable[i];
     if((pte & PTE_V) && (pte & (PTE_R|PTE_W|PTE_X)) == 0){
       // this PTE points to a lower-level page table.
-      uint64 child = PTE2PA(pte);
+      uint64 child = PTE2PA(pte); // >> 10 then << 12
       freewalk((pagetable_t)child);
       pagetable[i] = 0;
     } else if(pte & PTE_V){

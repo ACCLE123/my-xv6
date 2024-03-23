@@ -56,7 +56,10 @@ kfree(void *pa)
 
   r = (struct run*)pa;
 
+  // modify
   acquire(&kmem.lock);
+  // insert a node into the freelist
+  // this node is pa
   r->next = kmem.freelist;
   kmem.freelist = r;
   release(&kmem.lock);
@@ -75,6 +78,10 @@ kalloc(void)
   if(r)
     kmem.freelist = r->next;
   release(&kmem.lock);
+  // remove the head of freelist
+  // the r is the free memory block 
+  // kmem = freelist + lock
+  // every modification of freelist muse be locked
 
   if(r)
     memset((char*)r, 5, PGSIZE); // fill with junk
